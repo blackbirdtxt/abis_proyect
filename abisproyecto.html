@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Inversiones Premium</title>
+    <!-- Google Fonts: Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        :root {
+            --primary: #6366f1; /* Indigo moderno */
+            --bg: #f3f4f6;
+            --glass: rgba(255, 255, 255, 0.9);
+            --text-main: #1e293b;
+            --text-sec: #64748b;
+            /* Colores de estado */
+            --color-convocatoria: #3b82f6;
+            --color-adjudicado: #f59e0b;
+            --color-desierto: #ef4444;
+            --color-ejecutado: #10b981;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at top right, #e0e7ff, transparent);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-weight: 700;
+            font-size: 2.2rem;
+            letter-spacing: -1px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Card del Formulario */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-sec);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 12px;
+            color: var(--text-sec);
+            width: 18px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            outline: none;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn-add {
+            grid-column: 1 / -1;
+            background: var(--primary);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn-add:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+
+        /* Estilos de la Tabla */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            min-width: 900px;
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 16px;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-sec);
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        td {
+            padding: 20px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        /* Status Pills */
+        .status-pill {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .convocatoria { background: #eff6ff; color: var(--color-convocatoria); }
+        .adjudicado { background: #fffbeb; color: var(--color-adjudicado); }
+        .desierto { background: #fef2f2; color: var(--color-desierto); }
+        .ejecutado { background: #ecfdf5; color: var(--color-ejecutado); }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 120px;
+        }
+        .progress-text {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .progress-bar-bg {
+            background: #e2e8f0;
+            height: 6px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #818cf8);
+            border-radius: 10px;
+            transition: width 1s ease-in-out;
+        }
+
+        .budget-text {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-sec);
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1><i data-lucide="layout-dashboard"></i> Tablero de Inversiones</h1>
+        <p style="color: var(--text-sec); font-weight: 400;">Gestión simplificada con estándares de alta visibilidad</p>
+    </header>
+
+    <!-- Sección de Entrada -->
+    <div class="glass-card">
+        <form id="investForm" class="form-grid">
+            
+            <div class="input-group">
+                <label><i data-lucide="info"></i> Nombre de Inversión</label>
+                <div class="input-wrapper">
+                    <i data-lucide="briefcase"></i>
+                    <input type="text" id="nombre" placeholder="Ej: Planta Solar Atacama" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label><i data-lucide="dollar-sign"></i> Presupuesto Asignado</label>
+                <div class="input-wrapper">
+                    <i data-lucide="coins"></i>
+                    <input type="number" id="presupuesto" placeholder="500000" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label><i data-lucide="activity"></i> Estado Actual</label>
+                <div class="input-wrapper">
+                    <i data-lucide="layers"></i>
+                    <select id="estado">
+                        <option value="convocatoria">Convocatoria</option>
+                        <option value="adjudicado">Adjudicado</option>
+                        <option value="desierto">Desierto</option>
+                        <option value="ejecutado">Ejecutado</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label><i data-lucide="trending-up"></i> % de Avance</label>
+                <div class="input-wrapper">
+                    <i data-lucide="percent"></i>
+                    <input type="number" id="avance" min="0" max="100" value="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label><i data-lucide="calendar"></i> Fecha Estimada</label>
+                <div class="input-wrapper">
+                    <i data-lucide="calendar-days"></i>
+                    <input type="date" id="fecha">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-add">
+                <i data-lucide="plus-circle"></i> Agregar al Tablero Digital
+            </button>
+        </form>
+    </div>
+
+    <!-- Tabla de Visualización -->
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Proyecto</th>
+                    <th>Presupuesto</th>
+                    <th>Estado</th>
+                    <th>Avance Real</th>
+                    <th>Fecha Est.</th>
+                </tr>
+            </thead>
+            <tbody id="boardBody">
+                <!-- Se llenará dinámicamente -->
+            </tbody>
+        </table>
+        <div id="noData" class="empty-state">
+            <i data-lucide="database" style="margin-bottom: 10px; opacity: 0.5;"></i>
+            <p>No hay inversiones registradas aún.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Inicializar Iconos
+    lucide.createIcons();
+
+    const form = document.getElementById('investForm');
+    const tableBody = document.getElementById('boardBody');
+    const noData = document.getElementById('noData');
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Captura de datos
+        const nombre = document.getElementById('nombre').value;
+        const presupuesto = document.getElementById('presupuesto').value;
+        const estado = document.getElementById('estado').value;
+        const avance = document.getElementById('avance').value;
+        const fecha = document.getElementById('fecha').value;
+
+        // Formatear Moneda
+        const formatCurrency = new Intl.NumberFormat('es-CL', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0
+        }).format(presupuesto);
+
+        // Ocultar mensaje de vacío
+        noData.style.display = 'none';
+
+        // Crear Fila
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+            <td style="font-weight: 600;">${nombre}</td>
+            <td class="budget-text">${formatCurrency}</td>
+            <td>
+                <span class="status-pill ${estado}">
+                    <i data-lucide="circle-dot" style="width:12px"></i>
+                    ${estado.toUpperCase()}
+                </span>
+            </td>
+            <td>
+                <div class="progress-container">
+                    <span class="progress-text">${avance}%</span>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: ${avance}%"></div>
+                    </div>
+                </div>
+            </td>
+            <td style="color: #64748b; font-size: 0.85rem;">
+                <div style="display:flex; align-items:center; gap:5px">
+                    <i data-lucide="calendar" style="width:14px"></i>
+                    ${fecha ? fecha : 'Pendiente'}
+                </div>
+            </td>
+        `;
+
+        tableBody.appendChild(row);
+        
+        // Refrescar iconos para la nueva fila
+        lucide.createIcons();
+
+        // Reset y feedback
+        form.reset();
+        row.style.animation = "fadeIn 0.5s ease forwards";
+    });
+</script>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+</body>
+</html>
